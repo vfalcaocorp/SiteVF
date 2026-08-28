@@ -10,3 +10,7 @@
 *.mov
 .DS_Store
 Thumbs.db
+
+# arquivos de desenvolvimento local
+.claude/
+showreel.mp4
