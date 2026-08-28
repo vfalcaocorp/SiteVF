@@ -326,12 +326,15 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
   opacity:0;transform:scale(.95) translateY(16px);
   transition:opacity var(--t-mid) var(--glide),transform var(--t-slow) var(--glide)}
 #modal.shown .inner{opacity:1;transform:none}
-.m-stage{position:relative;aspect-ratio:9/16;max-height:78vh;margin:0 auto;background:#000;overflow:hidden}
+/* width:100% é obrigatório: o único filho é absoluto, então sem largura
+   explícita a caixa encolhe para zero e o vídeo some. */
+.m-stage{position:relative;width:100%;aspect-ratio:9/16;max-height:78vh;
+  background:#000;overflow:hidden}
 .m-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 .m-kick{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--warm);
   text-transform:uppercase;margin-bottom:12px}
-#modal h3{font-family:var(--disp);font-size:clamp(26px,3.4vw,42px);font-weight:300;letter-spacing:-.038em;line-height:1.06}
-.m-count{font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:14px;font-variant-numeric:tabular-nums}
+#modal h3{font-family:var(--disp);font-size:clamp(30px,4vw,52px);font-weight:300;letter-spacing:-.04em;line-height:1.02}
+.m-kick{font-variant-numeric:tabular-nums}
 .m-actions{display:flex;gap:9px;margin-top:26px;flex-wrap:wrap}
 .m-nav{position:fixed;bottom:26px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:810}
 .m-close{position:fixed;top:22px;right:var(--pad);z-index:810}
@@ -494,9 +497,8 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
   <div class="inner">
     <div class="m-stage"><video id="mVid" playsinline controls preload="metadata"></video></div>
     <div>
-      <p class="m-kick" id="mCat">Setor</p>
-      <h3 id="mT">Trabalho</h3>
-      <p class="m-count" id="mCount"></p>
+      <p class="m-kick" id="mCount"></p>
+      <h3 id="mT">Setor</h3>
       <div class="m-actions">
         <button class="pill" id="mSound" data-cursor="link">Som desligado</button>
         <a class="pill" id="mWhats" href="#" target="_blank" rel="noopener" data-cursor="link">Quero um assim</a>
@@ -514,12 +516,12 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
    CONFIGURAÇÃO — é só aqui que você mexe no dia a dia
    ═══════════════════════════════════════════════════════════ */
 const CONFIG = {
-  /* WhatsApp: só números, com 55 + DDD. Ex.: '5543999998888' */
-  whatsapp: '5543999998888',
+  /* WhatsApp: só números, com 55 + DDD. Ex.: '5518997974823' */
+  whatsapp: '5518997974823',
   /* mensagem já preenchida ao abrir a conversa */
   whatsappMsg: 'Oi Vitor! Vi seu portfólio e queria falar sobre um vídeo.',
-  /* Instagram: só o @ sem arroba. Ex.: 'vitor.video' */
-  instagram: 'seuperfil',
+  /* Instagram: só o nome, sem arroba */
+  instagram: 'falcao182',
 
   /* Onde estão os vídeos leves gerados por comprimir-videos.ps1 */
   base: 'web/'
@@ -803,9 +805,8 @@ function fill(i){
   mVid.muted=false;
   mSound.textContent='Som ligado';
   mVid.play().catch(()=>{mVid.muted=true;mSound.textContent='Som desligado';mVid.play().catch(()=>{})});
-  mCat.textContent=p.seg;
-  mT.textContent='Trabalho para '+p.seg;
-  mCount.textContent=String(cur+1).padStart(2,'0')+' de '+String(visiveis.length).padStart(2,'0');
+  mT.textContent=p.seg;
+  mCount.textContent='Trabalho '+String(cur+1).padStart(2,'0')+' de '+String(visiveis.length).padStart(2,'0');
 }
 function openM(el){
   pararPrevia();
