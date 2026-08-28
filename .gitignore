@@ -1,11 +1,12 @@
-Alimentação/
-Confecção/
-Contabilidade/
-Imobiliário/
-Marketing/
-Saúde/
-Shows/
-Varejo/
+# pastas de originais (pesadas) — NÃO vão para o GitHub
+/Alimentação/
+/Confecção/
+/Contabilidade/
+/Imobiliário/
+/Marketing/
+/Saúde/
+/Shows/
+/Varejo/
 *.mov
 .DS_Store
 Thumbs.db
