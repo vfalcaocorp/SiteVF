@@ -51,7 +51,9 @@ function Get-InstantePoster([string]$arquivo) {
 $feitos = 0; $pulados = 0; $total = 0
 
 # ---------- 1. videos dos setores ----------
-$segmentos = Get-ChildItem -Directory | Where-Object { $_.Name -ne 'web' }
+# 'web' e a saida; 'Logos' e material das logos (ver preparar-logos.py)
+$ignorar = @('web', 'Logos', '.git', '.claude')
+$segmentos = Get-ChildItem -Directory | Where-Object { $ignorar -notcontains $_.Name }
 
 foreach ($segItem in $segmentos) {
     $seg = $segItem.Name
@@ -111,12 +113,6 @@ if (Test-Path -LiteralPath $showreelOrigem) {
     }
 } else {
     Write-Host "Sem showreel.mp4 na raiz - o topo do site usa os frames dos trabalhos." -ForegroundColor DarkGray
-}
-
-# ---------- 3. aviso sobre o retrato ----------
-if (-not (Test-Path -LiteralPath (Join-Path 'web' 'retrato.jpg'))) {
-    Write-Host "Sem web\retrato.jpg - a secao Sobre fica sem foto." -ForegroundColor DarkGray
-    Write-Host "  Salve sua foto (vertical, 4:5) como web\retrato.jpg" -ForegroundColor DarkGray
 }
 
 Write-Host ""

@@ -264,16 +264,10 @@ h2{font-size:clamp(30px,5vw,64px)}
 .bone h2,.bone h3,.bone .lead{color:var(--ink)}
 .bone .sec-head{border-color:var(--hair-l)}
 .bone .sec-head .mono{color:#9b9d94}
-.about{display:grid;grid-template-columns:300px 1fr;gap:64px;align-items:start}
-.about-portrait{position:relative;aspect-ratio:4/5;overflow:hidden;background:#e3e4dc;
-  border:1px solid var(--hair-l)}
-.about-portrait img{width:100%;height:100%;object-fit:cover}
-.about-portrait .ph{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:7px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#9b9d94;text-align:center;padding:16px}
-.bone p{font-size:18px;line-height:1.62;max-width:56ch;margin-bottom:16px}
-.bone .lead{font-family:var(--disp);font-size:clamp(25px,3.2vw,40px);font-weight:300;
-  line-height:1.14;letter-spacing:-.035em;margin-bottom:24px;max-width:20ch}
+.about{display:grid;grid-template-columns:minmax(260px,1fr) 1.1fr;gap:60px;align-items:start}
+.bone p{font-size:18px;line-height:1.62;max-width:58ch;margin-bottom:16px}
+.bone .lead{font-family:var(--disp);font-size:clamp(27px,3.6vw,46px);font-weight:300;
+  line-height:1.1;letter-spacing:-.038em;margin-bottom:0;max-width:15ch}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:28px}
 .tags span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   border:1px solid rgba(0,0,0,.18);border-radius:9999px;padding:7px 14px;color:var(--ink)}
@@ -295,13 +289,20 @@ h2{font-size:clamp(30px,5vw,64px)}
 .step[aria-expanded="true"] .step-x{transform:rotate(45deg)}
 
 /* ── CLIENTES (oculto até haver logos reais) ─────── */
-.logos{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--hair);border-left:1px solid var(--hair)}
-.logo{aspect-ratio:2/1;border-right:1px solid var(--hair);border-bottom:1px solid var(--hair);
-  display:flex;align-items:center;justify-content:center;padding:18px;
-  transition:background var(--t-mid) var(--glide)}
-.logo img{max-height:100%;width:auto;object-fit:contain;filter:grayscale(1) brightness(2);opacity:.62;
-  transition:opacity var(--t-fast) ease}
+/* Cada logo fica na sua própria placa, no fundo em que foi desenhado.
+   object-fit:contain garante que nada estica: a arte cabe inteira. */
+.logos{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
+.logo{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+  padding:26px;overflow:hidden;
+  transition:transform var(--t-mid) var(--glide)}
+.logo.claro{background:var(--paper)}
+.logo.escuro{background:#131317;box-shadow:inset 0 0 0 1px var(--hair)}
+.logo img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;
+  opacity:.82;transition:opacity var(--t-fast) ease}
 .logo:hover img{opacity:1}
+.logos-vazio{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.1em;
+  border:1px dashed var(--hair);padding:26px;text-align:center;line-height:2}
+@media(max-width:900px){.logos{grid-template-columns:repeat(2,1fr)}}
 
 /* ── CONTATO ─────────────────────────────────────── */
 .contact{padding-top:120px;padding-bottom:0}
@@ -351,8 +352,7 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
 @media(max-width:900px){
   :root{--pad:20px}
   .hero{justify-content:flex-end;padding-top:120px;padding-bottom:36px}
-  .about{grid-template-columns:1fr;gap:30px}
-  .about-portrait{max-width:240px}
+  .about{grid-template-columns:1fr;gap:26px}
   .sec{padding-top:76px;padding-bottom:76px}
   #modal{padding:14px}
   #modal .inner{grid-template-columns:1fr;gap:20px;max-width:380px}
@@ -456,16 +456,14 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
 <section class="bone pad" id="sobre" style="padding-top:110px">
   <div class="sec-head"><h2>Sobre</h2><span class="mono">Vitor · Apucarana, PR</span></div>
   <div class="about">
-    <div class="about-portrait">
-      <img src="web/retrato.jpg" alt="Retrato de Vitor" id="retrato" onerror="this.style.display='none'">
-      <span class="ph">Salve sua foto como<br><b>web/retrato.jpg</b><br>(vertical, 4:5)</span>
-    </div>
     <div>
       <p class="lead">Quase nunca o problema é o produto. É como ele chega na tela.</p>
+      <div class="tags"><span>Premiere Pro</span><span>After Effects</span><span>DaVinci Resolve</span><span>Motion</span><span>Cor</span><span>Som</span></div>
+    </div>
+    <div>
       <p>A maioria das marcas com quem eu trabalho já faz bem o que faz. Mas o vídeo chega no feed pior do que a coisa é na vida real: luz errada, corte arrastado, som abafado. Em três segundos a pessoa já rolou pra baixo — e ficou com uma impressão que não é verdade.</p>
       <p>Meu trabalho é fechar essa distância. Pegar o que a sua empresa já entrega de bom e colocar na tela com o mesmo cuidado, do primeiro corte ao arquivo pronto pra publicar.</p>
       <p>Já fiz isso para restaurante, imobiliária, clínica, confecção, escritório de contabilidade, varejo e produtora de show. Cada setor tem um jeito de se mostrar. O que não muda é o acabamento.</p>
-      <div class="tags"><span>Premiere Pro</span><span>After Effects</span><span>DaVinci Resolve</span><span>Motion</span><span>Cor</span><span>Som</span></div>
     </div>
   </div>
 </section>
@@ -475,10 +473,13 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
   <div class="steps" id="steps"></div>
 </section>
 
-<!-- CLIENTES — some enquanto não houver logos reais.
-     Para ligar: salve os arquivos em web/logos/ e troque hidden por nada. -->
+<!-- CLIENTES — as placas aparecem sozinhas conforme os arquivos existirem
+     em web/logos/. Se nenhum existir, a seção inteira se esconde. -->
 <section class="sec pad" id="clientes" hidden>
-  <div class="sec-head"><h2 style="font-size:clamp(24px,3vw,34px)">Clientes</h2></div>
+  <div class="sec-head">
+    <h2 style="font-size:clamp(26px,3.4vw,40px)">Marcas com quem<br>já trabalhei</h2>
+    <span class="mono muted" id="logosCount"></span>
+  </div>
   <div class="logos" id="logos"></div>
 </section>
 
@@ -597,6 +598,43 @@ document.getElementById('rows').innerHTML=`
 <div class="row"><span class="k">Onde</span><span class="v">Apucarana, PR — atendo remoto</span></div>
 <div class="row"><span class="k">Agenda</span><span class="v">Aberta para novos projetos</span></div>`;
 document.getElementById('yr').textContent=new Date().getFullYear();
+
+/* ── CLIENTES ────────────────────────────────────────
+   Salve cada arquivo em web/logos/ com o nome abaixo (.png).
+   fundo:'claro'  → placa branca (logo desenhado para fundo claro)
+   fundo:'escuro' → placa preta  (logo com texto branco)
+   Placas cujo arquivo não existir somem sozinhas. */
+const LOGOS=[
+ {arq:'rose-pasteis',      nome:'Rose Pastéis',            fundo:'claro'},
+ {arq:'brasa-grill',       nome:'Restaurante Brasa Grill', fundo:'claro'},
+ {arq:'triad-caps',        nome:'Tríad Caps',              fundo:'escuro'},
+ {arq:'fcgroup',           nome:'FC Group Contabilidade',  fundo:'escuro'},
+ {arq:'ceriani-craveiro',  nome:'Ceriani Craveiro Imóveis',fundo:'claro'},
+ {arq:'andrade',           nome:'Andrade Imobiliária',     fundo:'claro'},
+ {arq:'placemed',          nome:'placeMed Consultórios',   fundo:'claro'},
+ {arq:'darka',             nome:'Tintas Darka',            fundo:'claro'}
+];
+(function(){
+  const sec=document.getElementById('clientes'), wrap=document.getElementById('logos');
+  wrap.innerHTML=LOGOS.map(l=>
+    `<div class="logo ${l.fundo}" data-arq="${l.arq}">
+       <img src="web/logos/${l.arq}.png" alt="${l.nome}" loading="eager" decoding="async">
+     </div>`).join('');
+  /* eager de propósito: a seção nasce oculta e imagem lazy dentro de
+     display:none nunca carregaria — a seção nunca se revelaria. */
+  let ok=0, faltam=LOGOS.length;
+  const conferir=()=>{
+    if(--faltam>0)return;
+    if(ok>0){
+      sec.hidden=false;
+      document.getElementById('logosCount').textContent=ok+(ok===1?' marca':' marcas');
+    }
+  };
+  wrap.querySelectorAll('img').forEach(im=>{
+    im.addEventListener('load',()=>{ok++;conferir()});
+    im.addEventListener('error',()=>{im.closest('.logo').remove();conferir()});
+  });
+})();
 
 /* ── HERO: setores + fundo ───────────────────────── */
 document.getElementById('heroSecs').innerHTML=
