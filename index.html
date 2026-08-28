@@ -291,19 +291,26 @@ h2{font-size:clamp(30px,5vw,64px)}
 /* ── CLIENTES (oculto até haver logos reais) ─────── */
 /* Cada logo fica na sua própria placa, no fundo em que foi desenhado.
    object-fit:contain garante que nada estica: a arte cabe inteira. */
+/* Esteira contínua, no mesmo espírito da faixa de setores.
+   Sangra até as bordas mesmo dentro da seção com padding. */
+.logos{position:relative;overflow:hidden;
+  margin-left:calc(var(--pad) * -1);margin-right:calc(var(--pad) * -1);
+  border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent)}
+.logos-track{display:flex;width:max-content;animation:slide 52s linear infinite}
+.logos:hover .logos-track{animation-play-state:paused}
+
 /* A folga ao redor de cada logo já vem assada no PNG (800×500, mesma
    proporção da placa). Por isso a placa não tem padding nem opacidade:
    três brancos diferentes empilhados criavam uma caixa dentro da outra. */
-.logos{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
-.logo{position:relative;aspect-ratio:16/10;overflow:hidden}
+.logo{flex:none;width:260px;aspect-ratio:16/10;overflow:hidden;margin-right:var(--gap)}
 .logo.claro{background:#fff}
 .logo.escuro{background:#131317}
 .logo img{width:100%;height:100%;object-fit:contain;
   transition:transform var(--t-slow) var(--glide)}
-.logo:hover img{transform:scale(1.04)}
-.logos-vazio{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.1em;
-  border:1px dashed var(--hair);padding:26px;text-align:center;line-height:2}
-@media(max-width:900px){.logos{grid-template-columns:repeat(2,1fr)}}
+.logo:hover img{transform:scale(1.05)}
+@media(max-width:560px){.logo{width:200px}}
 
 /* ── CONTATO ─────────────────────────────────────── */
 .contact{padding-top:120px;padding-bottom:0}
@@ -376,6 +383,10 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
   .work{opacity:1;transform:none}
   .hero-lede,.hero-cta,.hero-secs,.badge{opacity:1}
   #cursor{display:none}
+  /* as esteiras param no começo e rolam na mão — a regra acima
+     sozinha as faria saltar direto para o fim da animação */
+  .marq-track,.logos-track{animation:none!important;transform:none!important}
+  .marq,.logos{overflow-x:auto}
 }
 </style>
 </head>
@@ -481,7 +492,7 @@ footer{padding:36px 0 32px;margin-top:84px;border-top:1px solid var(--hair);
     <h2 style="font-size:clamp(26px,3.4vw,40px)">Marcas com quem<br>já trabalhei</h2>
     <span class="mono muted" id="logosCount"></span>
   </div>
-  <div class="logos" id="logos"></div>
+  <div class="logos"><div class="logos-track" id="logosTrack"></div></div>
 </section>
 
 <section class="contact pad" id="contato">
@@ -605,36 +616,42 @@ document.getElementById('yr').textContent=new Date().getFullYear();
    fundo:'claro'  → placa branca (logo desenhado para fundo claro)
    fundo:'escuro' → placa preta  (logo com texto branco)
    Placas cujo arquivo não existir somem sozinhas. */
+/* Ordem pensada para a esteira: as duas placas escuras ficam a quatro
+   posições uma da outra, senão formam um bloco pesado no meio do ciclo. */
 const LOGOS=[
  {arq:'rose-pasteis',      nome:'Rose Pastéis',            fundo:'claro'},
- {arq:'brasa-grill',       nome:'Restaurante Brasa Grill', fundo:'claro'},
- {arq:'triad-caps',        nome:'Tríad Caps',              fundo:'escuro'},
- {arq:'fcgroup',           nome:'FC Group Contabilidade',  fundo:'escuro'},
  {arq:'ceriani-craveiro',  nome:'Ceriani Craveiro Imóveis',fundo:'claro'},
+ {arq:'triad-caps',        nome:'Tríad Caps',              fundo:'escuro'},
+ {arq:'darka',             nome:'Tintas Darka',            fundo:'claro'},
+ {arq:'brasa-grill',       nome:'Restaurante Brasa Grill', fundo:'claro'},
  {arq:'andrade',           nome:'Andrade Imobiliária',     fundo:'claro'},
- {arq:'placemed',          nome:'placeMed Consultórios',   fundo:'claro'},
- {arq:'darka',             nome:'Tintas Darka',            fundo:'claro'}
+ {arq:'fcgroup',           nome:'FC Group Contabilidade',  fundo:'escuro'},
+ {arq:'placemed',          nome:'placeMed Consultórios',   fundo:'claro'}
 ];
-(function(){
-  const sec=document.getElementById('clientes'), wrap=document.getElementById('logos');
-  wrap.innerHTML=LOGOS.map(l=>
+(async function(){
+  const sec=document.getElementById('clientes'), track=document.getElementById('logosTrack');
+  /* Descobre quais arquivos existem ANTES de montar a esteira.
+     Sondar com new Image() evita o impasse de imagem dentro de
+     display:none — e garante que a esteira só duplique o que existe. */
+  const achados=await Promise.all(LOGOS.map(l=>new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>res(l); im.onerror=()=>res(null);
+    im.src='web/logos/'+l.arq+'.png';
+  })));
+  const ok=achados.filter(Boolean);
+  if(!ok.length)return;
+
+  /* o conjunto entra duas vezes: a animação corre 50% e reinicia sem emenda */
+  const volta=ok.map(l=>
     `<div class="logo ${l.fundo}" data-arq="${l.arq}">
-       <img src="web/logos/${l.arq}.png" alt="${l.nome}" loading="eager" decoding="async">
+       <img src="web/logos/${l.arq}.png" alt="${l.nome}" decoding="async">
      </div>`).join('');
-  /* eager de propósito: a seção nasce oculta e imagem lazy dentro de
-     display:none nunca carregaria — a seção nunca se revelaria. */
-  let ok=0, faltam=LOGOS.length;
-  const conferir=()=>{
-    if(--faltam>0)return;
-    if(ok>0){
-      sec.hidden=false;
-      document.getElementById('logosCount').textContent=ok+(ok===1?' marca':' marcas');
-    }
-  };
-  wrap.querySelectorAll('img').forEach(im=>{
-    im.addEventListener('load',()=>{ok++;conferir()});
-    im.addEventListener('error',()=>{im.closest('.logo').remove();conferir()});
+  track.innerHTML=volta+volta;
+  track.querySelectorAll('.logo').forEach((el,i)=>{
+    if(i>=ok.length)el.setAttribute('aria-hidden','true');   // cópia: não repete no leitor de tela
   });
+  sec.hidden=false;
+  document.getElementById('logosCount').textContent=ok.length+(ok.length===1?' marca':' marcas');
 })();
 
 /* ── HERO: setores + fundo ───────────────────────── */
