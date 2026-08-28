@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  comprimir-videos.ps1
 #  Gera versoes leves dos videos para o portfolio (pasta web\)
 #  - video  : web\<Segmento>\<nome>.mp4   (H.264, ~1080x1920, faststart)
@@ -52,8 +52,9 @@ foreach ($seg in $segmentos) {
 
         if (-not (Test-Path $outMp4)) {
             & ffmpeg -y -loglevel error -i $_.FullName `
-                -vf $vf -c:v libx264 -preset medium -crf 23 -profile:v high -pix_fmt yuv420p `
-                -c:a aac -b:a 160k -movflags +faststart $outMp4
+                -vf $vf -c:v libx264 -preset medium -crf 27 -maxrate 2200k -bufsize 4400k `
+                -profile:v high -pix_fmt yuv420p `
+                -c:a aac -b:a 128k -movflags +faststart $outMp4
         }
         if (-not (Test-Path $outJpg)) {
             & ffmpeg -y -loglevel error -ss 1 -i $_.FullName `
