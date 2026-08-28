@@ -576,7 +576,7 @@ const grid=document.getElementById('grid');
 grid.innerHTML=P.map(p=>`
 <article class="work" data-cat="${p.cat}">
   <button class="work-btn" data-id="${p.id}" data-cursor="play" aria-label="Abrir ${p.t}">
-    <div class="slot">${p.poster?`<img class="pv" loading="lazy" src="${p.poster}" alt="" onerror="this.remove()">`:''}<span class="slot-tag">${p.id}</span><span class="slot-note">▶ ABRIR</span></div>
+    <div class="slot">${p.poster?`<img class="pv" src="${p.poster}" alt="" loading="eager" onerror="this.remove()">`:''}<span class="slot-tag">${p.id}</span><span class="slot-note">▶ ABRIR</span></div>
     <span class="work-scrim"></span>
     <span class="work-idx">${p.id}</span><span class="work-ratio">9:16</span>
     <div class="work-body">
@@ -662,13 +662,21 @@ new IntersectionObserver(es=>{
   es.forEach(e=>document.body.classList.toggle('inverted',e.isIntersecting));
 },{rootMargin:'-45% 0px -45% 0px'}).observe(document.getElementById('sobre'));
 
-/* reveal */
-const io=new IntersectionObserver(es=>{
-  es.forEach((e,i)=>{if(e.isIntersecting){
-    setTimeout(()=>e.target.classList.add('in'),RM?0:i*70);io.unobserve(e.target);
-  }});
-},{threshold:.1});
-document.querySelectorAll('.work').forEach(w=>io.observe(w));
+/* reveal — entrada escalonada (o clip-path zera o intersectionRatio, então não dá pra usar threshold) */
+{
+  const works=[...document.querySelectorAll('.work')];
+  const show=w=>w.classList.add('in');
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){
+      const i=works.indexOf(e.target);
+      setTimeout(()=>show(e.target),RM?0:Math.max(0,i%8)*60);
+      io.unobserve(e.target);
+    }});
+  },{rootMargin:'0px 0px -5% 0px'});
+  works.forEach(w=>io.observe(w));
+  /* rede de segurança: se em 1,2s algo não apareceu, mostra */
+  setTimeout(()=>works.forEach(show),1200);
+}
 
 /* filtros */
 const count=document.getElementById('count');
