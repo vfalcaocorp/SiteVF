@@ -291,15 +291,16 @@ h2{font-size:clamp(30px,5vw,64px)}
 /* ── CLIENTES (oculto até haver logos reais) ─────── */
 /* Cada logo fica na sua própria placa, no fundo em que foi desenhado.
    object-fit:contain garante que nada estica: a arte cabe inteira. */
+/* A folga ao redor de cada logo já vem assada no PNG (800×500, mesma
+   proporção da placa). Por isso a placa não tem padding nem opacidade:
+   três brancos diferentes empilhados criavam uma caixa dentro da outra. */
 .logos{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap)}
-.logo{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
-  padding:26px;overflow:hidden;
-  transition:transform var(--t-mid) var(--glide)}
-.logo.claro{background:var(--paper)}
-.logo.escuro{background:#131317;box-shadow:inset 0 0 0 1px var(--hair)}
-.logo img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;
-  opacity:.82;transition:opacity var(--t-fast) ease}
-.logo:hover img{opacity:1}
+.logo{position:relative;aspect-ratio:16/10;overflow:hidden}
+.logo.claro{background:#fff}
+.logo.escuro{background:#131317}
+.logo img{width:100%;height:100%;object-fit:contain;
+  transition:transform var(--t-slow) var(--glide)}
+.logo:hover img{transform:scale(1.04)}
 .logos-vazio{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.1em;
   border:1px dashed var(--hair);padding:26px;text-align:center;line-height:2}
 @media(max-width:900px){.logos{grid-template-columns:repeat(2,1fr)}}

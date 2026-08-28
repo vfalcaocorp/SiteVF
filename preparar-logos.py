@@ -33,18 +33,22 @@ OCUPA_W, OCUPA_H = 0.74, 0.68
 BRANCO = (255, 255, 255)
 PRETO = (19, 19, 23)          # igual ao .logo.escuro do CSS
 
-# arquivo de origem -> (nome de saida, fundo)
-# 'claro'  = arte escura, vai em fundo branco
-# 'escuro' = arte clara/branca, vai em fundo preto
+# arquivo de origem -> (nome de saida, fundo, modo)
+# fundo: 'claro'  = arte escura, vai em placa branca
+#        'escuro' = arte clara/branca, vai em placa preta
+# modo:  None                 = usa a imagem como esta (respeita transparencia)
+#        'branco-sobre-preto' = a arte e branca chapada num fundo preto solido.
+#                               Converte o brilho em transparencia, para a arte
+#                               assentar na placa sem deixar um retangulo preto.
 MARCAS = [
-    ('image-1787945504277.png', 'rose-pasteis',     'claro'),
-    ('Ativo 1-8.png',           'brasa-grill',      'claro'),
-    ('400X400 2.png',           'triad-caps',       'escuro'),
-    ('image-1787945509184.png', 'fcgroup',          'escuro'),
-    ('image-1787945511469.png', 'ceriani-craveiro', 'claro'),
-    ('image-1787945514172.png', 'andrade',          'claro'),
-    ('400x200.png',             'placemed',         'claro'),
-    ('image-1787945507196.png', 'darka',            'claro'),
+    ('image-1787945504277.png', 'rose-pasteis',     'claro',  None),
+    ('Ativo 1-8.png',           'brasa-grill',      'claro',  None),
+    ('400X400 2.png',           'triad-caps',       'escuro', 'branco-sobre-preto'),
+    ('image-1787945509184.png', 'fcgroup',          'escuro', None),
+    ('image-1787945511469.png', 'ceriani-craveiro', 'claro',  None),
+    ('image-1787945514172.png', 'andrade',          'claro',  None),
+    ('400x200.png',             'placemed',         'claro',  None),
+    ('image-1787945507196.png', 'darka',            'claro',  None),
 ]
 
 
@@ -66,8 +70,24 @@ def recortar(im):
     return im
 
 
-def preparar(caminho, fundo):
+def brilho_para_alpha(im):
+    """Arte branca chapada sobre preto -> arte branca com transparencia.
+
+    Usa o brilho de cada pixel como opacidade, entao as bordas suaves da
+    arte continuam suaves e nao sobra retangulo preto na placa.
+    """
+    rgb = im.convert('RGB')
+    alpha = rgb.convert('L')                       # brilho = quanto de tinta
+    branco = Image.new('RGB', im.size, (255, 255, 255))
+    saida = branco.convert('RGBA')
+    saida.putalpha(alpha)
+    return saida
+
+
+def preparar(caminho, fundo, modo=None):
     im = Image.open(caminho).convert('RGBA')
+    if modo == 'branco-sobre-preto':
+        im = brilho_para_alpha(im)
     im = recortar(im)
 
     cor = BRANCO if fundo == 'claro' else PRETO
@@ -93,12 +113,12 @@ def main():
     os.makedirs(DESTINO, exist_ok=True)
 
     feitos, faltando = 0, []
-    for arquivo, nome, fundo in MARCAS:
+    for arquivo, nome, fundo, modo in MARCAS:
         origem = os.path.join(ORIGEM, arquivo)
         if not os.path.exists(origem):
             faltando.append(arquivo)
             continue
-        tela, tam = preparar(origem, fundo)
+        tela, tam = preparar(origem, fundo, modo)
         saida = os.path.join(DESTINO, nome + '.png')
         tela.save(saida, optimize=True)
         print('  %-18s fundo %-7s arte %dx%d  ->  %s' % (nome, fundo, tam[0], tam[1], saida))
