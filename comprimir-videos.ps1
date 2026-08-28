@@ -24,39 +24,41 @@ if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-$segmentos = 'Alimentação','Confecção','Contabilidade','Imobiliário','Marketing','Saúde','Shows','Varejo'
+# pega TODAS as subpastas (menos 'web') -- evita problema com acentos
+$segmentos = Get-ChildItem -Directory | Where-Object { $_.Name -ne 'web' }
 
 # escala: cabe dentro de 1080x1920 mantendo proporcao, dimensoes pares
 $vf = "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
 $total = 0; $feitos = 0; $pulados = 0
 
-foreach ($seg in $segmentos) {
-    if (-not (Test-Path $seg)) { continue }
+foreach ($segItem in $segmentos) {
+    $seg = $segItem.Name
+    Write-Host "Pasta: $seg" -ForegroundColor White
     $destDir = Join-Path 'web' $seg
     New-Item -ItemType Directory -Force -Path $destDir | Out-Null
 
-    Get-ChildItem -Path $seg -File -Filter *.mp4 | ForEach-Object {
+    Get-ChildItem -LiteralPath $segItem.FullName -File -Filter *.mp4 | ForEach-Object {
         $total++
         $stem   = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
         $outMp4 = Join-Path $destDir "$stem.mp4"
         $outJpg = Join-Path $destDir "$stem.jpg"
 
-        if ((Test-Path $outMp4) -and (Test-Path $outJpg)) {
+        if ((Test-Path -LiteralPath $outMp4) -and (Test-Path -LiteralPath $outJpg)) {
             $pulados++
-            Write-Host "  pulado  $seg\$stem" -ForegroundColor DarkGray
+            Write-Host "  pulado  $stem" -ForegroundColor DarkGray
             return
         }
 
-        Write-Host "  gerando $seg\$stem ..." -ForegroundColor Cyan
+        Write-Host "  gerando $stem ..." -ForegroundColor Cyan
 
-        if (-not (Test-Path $outMp4)) {
+        if (-not (Test-Path -LiteralPath $outMp4)) {
             & ffmpeg -y -loglevel error -i $_.FullName `
                 -vf $vf -c:v libx264 -preset medium -crf 27 -maxrate 2200k -bufsize 4400k `
                 -profile:v high -pix_fmt yuv420p `
                 -c:a aac -b:a 128k -movflags +faststart $outMp4
         }
-        if (-not (Test-Path $outJpg)) {
+        if (-not (Test-Path -LiteralPath $outJpg)) {
             & ffmpeg -y -loglevel error -ss 1 -i $_.FullName `
                 -vframes 1 -vf "scale=640:-2" -q:v 3 $outJpg
         }
